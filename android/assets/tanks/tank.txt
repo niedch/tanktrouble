@@ -1,0 +1,134 @@
+
+{
+   "box2d": {
+      "images": {
+      "image": [
+      {
+         "path":"Unbenannt.PNG",
+         "name":"Unbenannt.PNG",
+         "x":"11",
+         "y":"1",
+         "rotation":"270",
+         "scaleX":"5",
+         "scaleY":"5",
+         "zDepth":"0",
+         "pinned":"true",
+         "atlas":"null"
+      }
+      ]
+      },
+      "bodies": {
+      "body": [
+         {
+            "name":"body2",
+            "x":"3",
+            "y":"-2",
+            "type":"dynamic",
+            "bullet":"false",
+            "image":"null",
+            "fixtures": {
+            "fixture": [
+               {
+                  "name":"301",
+                  "shapeType":"polygonShape",
+                  "restitution":"0",
+                  "density":"1",
+                  "friction":"1",
+                  "isSensor":"false",
+               "vertex": [
+               {
+                  "x":"-52",
+                  "y":"40"
+               },
+               {
+                  "x":"-52",
+                  "y":"-34"
+               },
+               {
+                  "x":"48",
+                  "y":"40"
+               }
+               ]
+               },
+               {
+                  "name":"302",
+                  "shapeType":"polygonShape",
+                  "restitution":"0",
+                  "density":"1",
+                  "friction":"1",
+                  "isSensor":"false",
+               "vertex": [
+               {
+                  "x":"48",
+                  "y":"-34"
+               },
+               {
+                  "x":"48",
+                  "y":"40"
+               },
+               {
+                  "x":"-52",
+                  "y":"-34"
+               }
+               ]
+               },
+               {
+                  "name":"351",
+                  "shapeType":"polygonShape",
+                  "restitution":"0",
+                  "density":"1",
+                  "friction":"1",
+                  "isSensor":"false",
+               "vertex": [
+               {
+                  "x":"67",
+                  "y":"-8"
+               },
+               {
+                  "x":"67",
+                  "y":"14"
+               },
+               {
+                  "x":"47",
+                  "y":"-8"
+               }
+               ]
+               },
+               {
+                  "name":"352",
+                  "shapeType":"polygonShape",
+                  "restitution":"0",
+                  "density":"1",
+                  "friction":"1",
+                  "isSensor":"false",
+               "vertex": [
+               {
+                  "x":"47",
+                  "y":"14"
+               },
+               {
+                  "x":"47",
+                  "y":"-8"
+               },
+               {
+                  "x":"67",
+                  "y":"14"
+               }
+               ]
+               }
+            ]
+            }
+         }
+      ]
+      },
+   "joints": {
+   },
+   "metaData": {
+   },
+      "settings": {
+      "setting": {
+         "isLocked":"true"
+      }
+      }
+   }
+}

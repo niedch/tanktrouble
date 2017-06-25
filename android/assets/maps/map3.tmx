@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="64" tileheight="64" nextobjectid="110">
+ <tileset firstgid="1" source="TankTrouble.tsx"/>
+ <layer name="Kachelebene 1" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJytkjEOADAIAuX/n+5OUInUxKUeGLWoKgTZxVYDccrP5VS/jmE/R6O0nc/Gq3B2BXpTNWZ+3ug6b7LnSePeN/1XUz/2u+YDtdgAZg==
+  </data>
+ </layer>
+ <objectgroup name="Collision">
+  <object id="52" x="0" y="0" width="960" height="64"/>
+  <object id="53" x="896" y="64" width="64" height="896"/>
+  <object id="54" x="0" y="896" width="896" height="64"/>
+  <object id="55" x="0" y="64" width="64" height="832"/>
+  <object id="56" x="128" y="576" width="64" height="128"/>
+  <object id="57" x="192" y="576" width="64" height="64"/>
+  <object id="58" x="320" y="576" width="64" height="64"/>
+  <object id="59" x="448" y="640" width="64" height="64"/>
+  <object id="60" x="576" y="576" width="64" height="64"/>
+  <object id="61" x="640" y="448" width="64" height="64"/>
+  <object id="62" x="576" y="320" width="64" height="64"/>
+  <object id="63" x="448" y="256" width="64" height="64"/>
+  <object id="64" x="320" y="320" width="64" height="64"/>
+  <object id="65" x="256" y="448" width="64" height="64"/>
+  <object id="66" x="384" y="448" width="192" height="64"/>
+  <object id="67" x="448" y="384" width="64" height="64"/>
+  <object id="68" x="448" y="512" width="64" height="64"/>
+  <object id="69" x="704" y="576" width="128" height="64"/>
+  <object id="70" x="768" y="640" width="64" height="64"/>
+  <object id="71" x="576" y="704" width="64" height="128"/>
+  <object id="72" x="640" y="768" width="64" height="64"/>
+  <object id="73" x="768" y="768" width="64" height="64"/>
+  <object id="74" x="448" y="832" width="64" height="64"/>
+  <object id="75" x="320" y="704" width="64" height="128"/>
+  <object id="76" x="256" y="768" width="64" height="64"/>
+  <object id="77" x="128" y="768" width="64" height="64"/>
+  <object id="78" x="64" y="448" width="64" height="64"/>
+  <object id="79" x="128" y="256" width="64" height="128"/>
+  <object id="80" x="192" y="320" width="64" height="64"/>
+  <object id="81" x="256" y="128" width="128" height="64"/>
+  <object id="82" x="320" y="192" width="64" height="64"/>
+  <object id="84" x="128" y="128" width="64" height="64"/>
+  <object id="85" x="576" y="128" width="128" height="64"/>
+  <object id="86" x="576" y="192" width="64" height="64"/>
+  <object id="87" x="448" y="64" width="64" height="64"/>
+  <object id="88" x="768" y="128" width="64" height="64"/>
+  <object id="89" x="768" y="256" width="64" height="128"/>
+  <object id="90" x="704" y="320" width="64" height="64"/>
+  <object id="91" x="832" y="448" width="64" height="64"/>
+ </objectgroup>
+ <objectgroup name="TankSpawnPoints">
+  <object id="92" x="192" y="192" width="128" height="128"/>
+  <object id="93" x="640" y="192" width="128" height="128"/>
+  <object id="94" x="640" y="640" width="128" height="128"/>
+  <object id="96" x="192" y="640" width="128" height="128"/>
+  <object id="97" x="128" y="448" width="64" height="64"/>
+  <object id="98" x="768" y="448" width="64" height="64"/>
+  <object id="99" x="448" y="128" width="64" height="64"/>
+  <object id="100" x="448" y="768" width="64" height="64"/>
+  <object id="101" x="512" y="384" width="64" height="64"/>
+  <object id="102" x="384" y="384" width="64" height="64"/>
+  <object id="104" x="384" y="512" width="64" height="64"/>
+  <object id="105" x="512" y="512" width="64" height="64"/>
+  <object id="106" x="832" y="64" width="64" height="64"/>
+  <object id="107" x="64" y="64" width="64" height="64"/>
+  <object id="108" x="64" y="832" width="64" height="64"/>
+  <object id="109" x="832" y="832" width="64" height="64"/>
+ </objectgroup>
+</map>
