@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
@@ -27,6 +28,8 @@ import Utils.Constants;
 import Utils.Map;
 import Utils.MusicHandler;
 import Utils.ParticleSystem;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 
 public abstract class GameState implements Screen,ContactListener, Runnable{
     protected Map map;
@@ -37,6 +40,7 @@ public abstract class GameState implements Screen,ContactListener, Runnable{
     private Stage stage;
     private Viewport viewport;
     protected MusicHandler musicHandler;
+    private RayHandler rayHandler;
 
     public GameState(MusicHandler musicHandler){
         Bullet.bullets.clear();
@@ -46,6 +50,7 @@ public abstract class GameState implements Screen,ContactListener, Runnable{
         viewport = new ExtendViewport(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),camera);
         world = new World(new Vector2(0,0),true);
         b2dr = new Box2DDebugRenderer();
+        rayHandler = new RayHandler(world);
         particleSystem = new ParticleSystem();
         if(musicHandler != null) {
             this.musicHandler = musicHandler;
@@ -64,6 +69,9 @@ public abstract class GameState implements Screen,ContactListener, Runnable{
             if(tank instanceof InputProcessor) im.addProcessor(tank);
         }
         Gdx.input.setInputProcessor(im);
+
+        Tank.initPointLight(rayHandler);
+
         world.setContactListener(this);
     }
 
@@ -83,10 +91,14 @@ public abstract class GameState implements Screen,ContactListener, Runnable{
             particleSystem.drawParticles(Constants.General.batch, delta);
         Constants.General.batch.end();
 
+        Tank.updatePointLight();
+
         stage.act(delta);
         stage.draw();
+        rayHandler.setCombinedMatrix(camera.combined);
+        rayHandler.updateAndRender();
 
-       b2dr.render(world, camera.combined);
+        //b2dr.render(world, camera.combined);
 
         deleteTaggedBodies();
         endSession();
@@ -116,6 +128,10 @@ public abstract class GameState implements Screen,ContactListener, Runnable{
             }
         }
         tmpBullet.clear();
+
+
+        rayHandler.removeAll();
+        Tank.initPointLight(rayHandler);
     }
 
     public void endSession() {

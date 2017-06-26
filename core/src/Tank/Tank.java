@@ -2,6 +2,7 @@ package Tank;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -17,6 +18,8 @@ import java.util.List;
 import Utils.Constants;
 import Utils.FizzXJSonLoader;
 import Utils.MusicHandler;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 
 public abstract class Tank extends Sprite implements InputProcessor{
     private World world;
@@ -27,12 +30,31 @@ public abstract class Tank extends Sprite implements InputProcessor{
     private MusicHandler musicHandler;
     private List<Bullet> myBullets;
     private long lastShotTime = 0;
+    private PointLight pointLight;
 
     protected boolean forward = false, backwards = false, left = false, right= false, isDead = false;
 
     static{
         tanks = new ArrayList<Tank>();
     }
+
+    public static void initPointLight(RayHandler rayHandler){
+        Vector2 vec;
+        for(Tank tank: tanks){
+            vec = Bullet.getStartPos(tank);
+            tank.setPointLight(new PointLight(rayHandler, 1000, Color.WHITE, 1000, vec.x, vec.y));
+        }
+    }
+
+    public static void updatePointLight(){
+        Vector2 vec;
+        for(Tank tank: tanks) {
+            vec = Bullet.getStartPos(tank);
+            tank.getPointLight().setPosition(vec.x,vec.y);
+        }
+    }
+
+
 
     public Tank(World world, String tankSkin, String tankName, MusicHandler musicHandler){
         super(new Texture(Gdx.files.internal(tankSkin)));
@@ -100,6 +122,14 @@ public abstract class Tank extends Sprite implements InputProcessor{
                 tank.draw(batch);
             }
         }
+    }
+
+    public PointLight getPointLight() {
+        return pointLight;
+    }
+
+    public void setPointLight(PointLight pointLight) {
+        this.pointLight = pointLight;
     }
 
     public void add(Tank tank){
