@@ -5,7 +5,8 @@ public enum ECommand {
     END_LOBBY("endLobby"),
     LIST_PLAYERS("listPlayers"),
     MAX_PLAYERS("maxplayers"),
-    UPDATE_LOBBY("updateLobby");
+    UPDATE_LOBBY("updateLobby"),
+    KICK("kick");
 
     private final String commandString;
 

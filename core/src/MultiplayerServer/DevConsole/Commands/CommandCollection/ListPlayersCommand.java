@@ -6,7 +6,7 @@ import MultiplayerServer.DevConsole.DevConsolePresenter;
 
 public class ListPlayersCommand extends Command {
     public ListPlayersCommand(DevConsolePresenter presenter) {
-        super(presenter);
+        super(presenter, ECommand.LIST_PLAYERS);
     }
 
     @Override
@@ -16,7 +16,7 @@ public class ListPlayersCommand extends Command {
 
     @Override
     protected void help() {
-
+        this.printHelp("List all players that are connected to the Server");
     }
 
     @Override

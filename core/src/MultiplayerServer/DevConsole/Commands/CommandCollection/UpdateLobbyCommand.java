@@ -6,7 +6,7 @@ import MultiplayerServer.DevConsole.DevConsolePresenter;
 
 public class UpdateLobbyCommand extends Command {
     public UpdateLobbyCommand(DevConsolePresenter presenter) {
-        super(presenter);
+        super(presenter, ECommand.UPDATE_LOBBY);
     }
 
     @Override
@@ -16,7 +16,7 @@ public class UpdateLobbyCommand extends Command {
 
     @Override
     protected void help() {
-
+        this.printHelp("Updates Lobbies on all connected Players");
     }
 
     @Override

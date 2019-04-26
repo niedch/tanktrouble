@@ -4,23 +4,23 @@ import MultiplayerServer.DevConsole.Commands.Command;
 import MultiplayerServer.DevConsole.Commands.ECommand;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 
-public class HelpCommand extends Command {
-    public HelpCommand(DevConsolePresenter presenter) {
-        super(presenter, ECommand.HELP);
+public class KickCommand extends Command {
+    public KickCommand(DevConsolePresenter presenter) {
+        super(presenter, ECommand.KICK);
     }
 
     @Override
     protected boolean isMatching(String command) {
-        return ECommand.HELP.startWith(command);
+        return ECommand.KICK.startWith(command);
     }
 
     @Override
     protected void help() {
-        this.presenter.println("Helps by showing help for all commands");
+        this.printHelp("Kicks players out of the game", "player");
     }
 
     @Override
     protected void execute(String command) {
-        this.presenter.printHelp();
+
     }
 }

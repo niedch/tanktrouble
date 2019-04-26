@@ -6,7 +6,7 @@ import MultiplayerServer.DevConsole.DevConsolePresenter;
 
 public class MaxPlayersCommand extends Command {
     public MaxPlayersCommand(DevConsolePresenter presenter) {
-        super(presenter);
+        super(presenter, ECommand.MAX_PLAYERS);
     }
 
     @Override
@@ -16,7 +16,7 @@ public class MaxPlayersCommand extends Command {
 
     @Override
     protected void help() {
-
+        this.printHelp("Sets maximum amount of players is restricted to map size", "amount");
     }
 
     @Override

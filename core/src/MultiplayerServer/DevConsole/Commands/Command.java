@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public abstract class Command {
-    public DevConsolePresenter presenter;
+    protected DevConsolePresenter presenter;
+    protected ECommand command;
 
-    public Command(DevConsolePresenter presenter) {
+    public Command(DevConsolePresenter presenter, ECommand command) {
         this.presenter = presenter;
+        this.command = command;
     }
 
     protected List<String> tokenize(String command){
@@ -22,6 +24,21 @@ public abstract class Command {
             tokenized.add(tokenizer.nextToken());
         }
         return tokenized;
+    }
+
+    protected void printHelp(String helpText, String ...parameters) {
+        if(parameters.length > 0) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String parameter: parameters) {
+                stringBuilder.append("<"+parameter+">");
+            }
+
+            this.presenter.println(command.toString() + " " + stringBuilder.toString() + " : "+ helpText);
+            return;
+        }
+
+
+        this.presenter.println(command.toString() + " : " + helpText);
     }
 
     protected abstract boolean isMatching(String command);

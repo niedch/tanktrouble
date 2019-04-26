@@ -5,7 +5,7 @@ import MultiplayerServer.DevConsole.DevConsolePresenter;
 
 public class DefaultCommand extends Command {
     public DefaultCommand(DevConsolePresenter presenter) {
-        super(presenter);
+        super(presenter, null);
     }
 
     @Override
@@ -15,7 +15,7 @@ public class DefaultCommand extends Command {
 
     @Override
     protected void help() {
-
+        // Not implemented on intention because it's never called
     }
 
     @Override

@@ -6,7 +6,7 @@ import MultiplayerServer.DevConsole.DevConsolePresenter;
 
 public class EndLobbyCommand extends Command {
     public EndLobbyCommand(DevConsolePresenter presenter) {
-        super(presenter);
+        super(presenter, ECommand.END_LOBBY);
     }
 
     @Override
@@ -16,7 +16,7 @@ public class EndLobbyCommand extends Command {
 
     @Override
     protected void help() {
-        this.presenter.println("Helps by showing help for all commands");
+        this.printHelp("Ends the lobby and starts the game");
     }
 
     @Override
