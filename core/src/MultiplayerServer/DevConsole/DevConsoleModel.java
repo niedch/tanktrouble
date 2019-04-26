@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DevConsoleModel {
-    private String textFieldtext = "test";
+    private String textFieldtext = "";
     private List<String> prints = new ArrayList<String>();
 
     public String getTextFieldtext() {
