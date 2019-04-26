@@ -1,6 +1,10 @@
 package MultiplayerServer.DevConsole;
 
 import MultiplayerServer.DevConsole.Commands.CommandList;
+import MultiplayerServer.DevConsole.Commands.ErrorHandling.ConsoleException;
+
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 
 public class DevConsolePresenter {
     private DevConsoleModel devConsoleModel;
@@ -12,24 +16,33 @@ public class DevConsolePresenter {
         devConsoleView = new DevConsoleView(this);
         devConsoleModel = new DevConsoleModel();
         commandsList = new CommandList(this);
+
+        printIP();
     }
 
-    public void submitCommand(String command) {
-        println(command);
-        commandsList.start(command);
-        clearTextField();
+    void submitCommand(String command) {
+        try {
+            println(command);
+            commandsList.start(command);
+            clearTextField();
+        } catch (ConsoleException e) {
+            e.printCommandHelp();
+            setTextFieldText(e.commandString);
+            devConsoleView.showError(e.getErrorMessage());
+        }
     }
 
     public void printHelp() {
         commandsList.help();
     }
 
-    public void clearTextField() {
+    private void clearTextField() {
         setTextFieldText("");
     }
 
-    public void setTextFieldText(String text) {
+    private void setTextFieldText(String text) {
         devConsoleModel.setTextFieldtext(text);
+        devConsoleView.updateView();
     }
 
     public void println(String text) {
@@ -37,7 +50,7 @@ public class DevConsolePresenter {
         devConsoleView.updateView();
     }
 
-    public String convertToText() {
+    String convertToText() {
         clearStringBuilder();
 
         for (String s : devConsoleModel.getPrints()) {
@@ -47,16 +60,16 @@ public class DevConsolePresenter {
         return stringBuilder.toString();
     }
 
+    private void printIP(){
+        try {
+            println("IP: " + Inet4Address.getLocalHost().getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
     String getTextFieldValue() {
         return devConsoleModel.getTextFieldtext();
-    }
-
-    public DevConsoleModel getDevConsoleModel() {
-        return devConsoleModel;
-    }
-
-    public DevConsoleView getDevConsoleView() {
-        return devConsoleView;
     }
 
     private void clearStringBuilder() {

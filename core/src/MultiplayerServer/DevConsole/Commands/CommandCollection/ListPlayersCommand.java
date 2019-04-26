@@ -15,7 +15,7 @@ public class ListPlayersCommand extends Command {
     }
 
     @Override
-    protected void help() {
+    public void help() {
         this.printHelp("List all players that are connected to the Server");
     }
 

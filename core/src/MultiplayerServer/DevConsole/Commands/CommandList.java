@@ -1,6 +1,7 @@
 package MultiplayerServer.DevConsole.Commands;
 
 import MultiplayerServer.DevConsole.Commands.CommandCollection.*;
+import MultiplayerServer.DevConsole.Commands.ErrorHandling.ConsoleException;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class CommandList extends ArrayList<Command> {
         this.defaultCommand = new DefaultCommand(presenter);
     }
 
-    public void start(String commandString){
+    public void start(String commandString) throws ConsoleException {
         for (Command command : this) {
             if (!command.isMatching(commandString)) {
                 continue;

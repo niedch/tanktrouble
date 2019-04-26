@@ -1,6 +1,7 @@
 package MultiplayerServer.DevConsole.Commands;
 
 
+import MultiplayerServer.DevConsole.Commands.ErrorHandling.ConsoleException;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 
 import java.util.ArrayList;
@@ -43,11 +44,16 @@ public abstract class Command {
 
     protected abstract boolean isMatching(String command);
 
-    protected abstract void help();
+    public abstract void help();
 
-    protected abstract void execute(String command);
+    protected abstract void execute(String command) throws ConsoleException;
 
     protected boolean isDefault() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return command.toString();
     }
 }

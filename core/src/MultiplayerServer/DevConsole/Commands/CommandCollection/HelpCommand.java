@@ -15,7 +15,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    protected void help() {
+    public void help() {
         this.presenter.println("Helps by showing help for all commands");
     }
 

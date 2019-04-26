@@ -13,13 +13,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 public class DevConsoleView extends JFrame implements IView {
     private JTextArea textArea;
@@ -59,7 +53,6 @@ public class DevConsoleView extends JFrame implements IView {
 
         this.add(panel,BorderLayout.SOUTH);
         this.setVisible(true);
-        printIP();
     }
 
 
@@ -70,28 +63,6 @@ public class DevConsoleView extends JFrame implements IView {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    private void handleCommand(String command){
-            if(command.startsWith("help")){
-                printHelp();
-            }else if(command.startsWith("endLobby")){
-                try {
-                    MainServer.serverSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }else if(command.startsWith("listPlayers")){
-                printConnectedPlayers();
-            }else if(command.startsWith("kick")){
-                kickPlayer(command.substring(command.indexOf(' ')+1));
-            }else if(command.startsWith("maxplayers")) {
-                maxplayers(command.substring(command.indexOf(' ') + 1));
-            }else if(command.startsWith("updateLobby")){
-                MainServer.updateLobby();
-            }else{
-                println("Unknown Command");
-            }
-    }
-
     private void kickPlayer(String player){
         for(Map.Entry<String, Client> entry : MainServer.clients.entrySet()){
             if(entry.getKey().equals(player)){
@@ -100,15 +71,6 @@ public class DevConsoleView extends JFrame implements IView {
             }
         }
         println("\""+player+"\" did not exist on this Server");
-    }
-
-    private void printIP(){
-
-        try {
-            println("IP: " + Inet4Address.getLocalHost().getHostAddress());
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
     }
 
     private void maxplayers(String maxPlayers){
@@ -127,15 +89,6 @@ public class DevConsoleView extends JFrame implements IView {
         textArea.append(s+"\n");
     }
 
-    private void printHelp(){
-        println("help - Tells you where you can find all Commands");
-        println("endLobby - Clients are no longer able to connect!");
-        println("updateLobby - Update the Lobby on all Clients !");
-        println("listPlayers - Shows all active Players");
-        println("kick <player> - Kicks player from the Server");
-        println("maxplayers <Amount> - Sets the max amount of Players");
-    }
-
     private void printConnectedPlayers(){
         for(HashMap.Entry<String, Client> entry : MainServer.clients.entrySet()){
             println("\t" + entry.getKey());
@@ -146,5 +99,13 @@ public class DevConsoleView extends JFrame implements IView {
     public void updateView() {
         textArea.setText(presenter.convertToText());
         textField.setText(presenter.getTextFieldValue());
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+        JOptionPane.showMessageDialog(this,
+                errorMessage,
+                "Upps error happend",
+                JOptionPane.ERROR_MESSAGE);
     }
 }

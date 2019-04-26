@@ -15,12 +15,11 @@ public class MaxPlayersCommand extends Command {
     }
 
     @Override
-    protected void help() {
+    public void help() {
         this.printHelp("Sets maximum amount of players is restricted to map size", "amount");
     }
 
     @Override
     protected void execute(String command) {
-
     }
 }

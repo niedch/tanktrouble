@@ -15,7 +15,7 @@ public class UpdateLobbyCommand extends Command {
     }
 
     @Override
-    protected void help() {
+    public void help() {
         this.printHelp("Updates Lobbies on all connected Players");
     }
 

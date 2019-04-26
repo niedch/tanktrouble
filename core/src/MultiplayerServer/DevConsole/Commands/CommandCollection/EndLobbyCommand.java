@@ -15,7 +15,7 @@ public class EndLobbyCommand extends Command {
     }
 
     @Override
-    protected void help() {
+    public void help() {
         this.printHelp("Ends the lobby and starts the game");
     }
 

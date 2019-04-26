@@ -14,7 +14,7 @@ public class DefaultCommand extends Command {
     }
 
     @Override
-    protected void help() {
+    public void help() {
         // Not implemented on intention because it's never called
     }
 

@@ -15,7 +15,7 @@ public class KickCommand extends Command {
     }
 
     @Override
-    protected void help() {
+    public void help() {
         this.printHelp("Kicks players out of the game", "player");
     }
 
