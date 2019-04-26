@@ -3,6 +3,7 @@ package MultiplayerServer.DevConsole.Commands.CommandCollection;
 import MultiplayerServer.DevConsole.Commands.Command;
 import MultiplayerServer.DevConsole.Commands.ECommand;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
+import MultiplayerServer.MainServer;
 
 public class UpdateLobbyCommand extends Command {
     public UpdateLobbyCommand(DevConsolePresenter presenter) {
@@ -21,6 +22,6 @@ public class UpdateLobbyCommand extends Command {
 
     @Override
     protected void execute(String command) {
-
+        MainServer.updateLobby();
     }
 }

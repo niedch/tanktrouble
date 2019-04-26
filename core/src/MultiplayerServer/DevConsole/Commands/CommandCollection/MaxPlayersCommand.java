@@ -2,7 +2,11 @@ package MultiplayerServer.DevConsole.Commands.CommandCollection;
 
 import MultiplayerServer.DevConsole.Commands.Command;
 import MultiplayerServer.DevConsole.Commands.ECommand;
+import MultiplayerServer.DevConsole.Commands.ErrorHandling.ConsoleException;
+import MultiplayerServer.DevConsole.Commands.ErrorHandling.MaxMapPlayerException;
+import MultiplayerServer.DevConsole.Commands.ErrorHandling.NotANumberException;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
+import MultiplayerServer.MainServer;
 
 public class MaxPlayersCommand extends Command {
     public MaxPlayersCommand(DevConsolePresenter presenter) {
@@ -20,6 +24,18 @@ public class MaxPlayersCommand extends Command {
     }
 
     @Override
-    protected void execute(String command) {
+    protected void execute(String command) throws ConsoleException {
+        try {
+            // Parses first parameter to integer
+            int maxPlayers = Integer.parseInt(this.tokenize(command).get(1));
+
+            if (MainServer.MAP_MAXPLAYER <= maxPlayers) {
+                throw new MaxMapPlayerException(this, command);
+            }
+
+            MainServer.MAX_PLAYERS = maxPlayers;
+        } catch (NumberFormatException e){
+            throw new NotANumberException(this, command);
+        }
     }
 }

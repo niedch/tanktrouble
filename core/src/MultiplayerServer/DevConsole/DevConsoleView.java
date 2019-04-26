@@ -1,17 +1,10 @@
 package MultiplayerServer.DevConsole;
 
-import MultiplayerServer.Client;
 import MultiplayerServer.IView;
-import MultiplayerServer.MainServer;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.*;
 
@@ -63,36 +56,9 @@ public class DevConsoleView extends JFrame implements IView {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    private void kickPlayer(String player){
-        for(Map.Entry<String, Client> entry : MainServer.clients.entrySet()){
-            if(entry.getKey().equals(player)){
-                entry.getValue().println(MainServer.createJSONObj("kick",null));
-                return;
-            }
-        }
-        println("\""+player+"\" did not exist on this Server");
-    }
-
-    private void maxplayers(String maxPlayers){
-        try {
-            if (MainServer.MAP_MAXPLAYER <= Integer.parseInt(maxPlayers)) {
-                this.println("New Value cannot be greater than the original on");
-            }else{
-                MainServer.MAX_PLAYERS = Integer.parseInt(maxPlayers);
-            }
-        } catch (NumberFormatException e){
-            this.println("Parameter is not a Number!");
-        }
-    }
 
     public void println(String s){
         textArea.append(s+"\n");
-    }
-
-    private void printConnectedPlayers(){
-        for(HashMap.Entry<String, Client> entry : MainServer.clients.entrySet()){
-            println("\t" + entry.getKey());
-        }
     }
 
     @Override
