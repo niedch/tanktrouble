@@ -4,23 +4,23 @@ import MultiplayerServer.DevConsole.Commands.Command;
 import MultiplayerServer.DevConsole.Commands.ECommand;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 
-public class HelpCommand extends Command {
-    public HelpCommand(DevConsolePresenter presenter) {
+public class MaxPlayersCommand extends Command {
+    public MaxPlayersCommand(DevConsolePresenter presenter) {
         super(presenter);
     }
 
     @Override
     protected boolean isMatching(String command) {
-        return ECommand.HELP.startWith(command);
+        return ECommand.MAX_PLAYERS.startWith(command);
     }
 
     @Override
     protected void help() {
-        this.presenter.println("Helps by showing help for all commands");
+
     }
 
     @Override
     protected void execute(String command) {
-        this.presenter.printHelp();
+
     }
 }

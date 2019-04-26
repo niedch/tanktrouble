@@ -20,6 +20,10 @@ public class DevConsolePresenter {
         clearTextField();
     }
 
+    public void printHelp() {
+        commandsList.help();
+    }
+
     public void clearTextField() {
         setTextFieldText("");
     }

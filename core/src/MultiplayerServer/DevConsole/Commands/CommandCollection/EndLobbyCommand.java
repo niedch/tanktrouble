@@ -11,7 +11,7 @@ public class EndLobbyCommand extends Command {
 
     @Override
     protected boolean isMatching(String command) {
-        return command.startsWith(ECommand.END_LOBBY.toString());
+        return ECommand.END_LOBBY.startWith(command);
     }
 
     @Override
