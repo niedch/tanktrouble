@@ -21,6 +21,10 @@ public class DevConsolePresenter {
     }
 
     void submitCommand(String command) {
+        if (command.isEmpty()) {
+            return;
+        }
+
         try {
             println(command);
             commandsList.start(command);
