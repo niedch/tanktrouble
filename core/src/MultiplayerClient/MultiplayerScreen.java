@@ -1,5 +1,6 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Messages.SubTypes.StartPosition;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
@@ -12,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 
 import Levels.GameState;
 import Tank.FriendlyTank;
@@ -26,7 +28,7 @@ import scenes.ScoreBoard;
 public class MultiplayerScreen extends GameState {
     static final String TAG = "MultiplayerScreen";
     private GameHandler gameHandler;
-    private JSONArray players;
+    private List<StartPosition> startPositions;
     private String mapFile;
     private FriendlyTank localTank;
     private BufferedReader reader;
@@ -38,10 +40,10 @@ public class MultiplayerScreen extends GameState {
     private JSONArray scoreArr = null;
     private JSONObject bulletData = null;
 
-    public MultiplayerScreen(String map, JSONArray players, Socket socket, GameHandler gameHandler, MusicHandler musicHandler) {
+    public MultiplayerScreen(String map, List<StartPosition> startPositions, Socket socket, GameHandler gameHandler, MusicHandler musicHandler) {
         super(musicHandler);
         this.gameHandler = gameHandler;
-        this.players = players;
+        this.startPositions = startPositions;
         this.mapFile = map;
         this.writer = new PrintWriter(socket.getOutputStream(),true);
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -50,8 +52,8 @@ public class MultiplayerScreen extends GameState {
 
     @Override
     public void show() {
-        for(int i = 0; i< players.length(); i++){
-            String player = players.getJSONObject(i).getString("name");
+        for(StartPosition startPosition: startPositions){
+            String player = startPosition.getPlayerName();
             if(!player.equals(gameHandler.getMyName())){
                 new MultiplayerTank(world, Constants.Tank.ENEMY_TANK,player, musicHandler);
             }else{
@@ -145,7 +147,7 @@ public class MultiplayerScreen extends GameState {
             }
         }).start();
 
-        map = new Map(world,camera,mapFile,players);
+        map = new Map(world,camera,mapFile,startPositions);
         super.show();
     }
 

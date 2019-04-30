@@ -88,6 +88,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         compile "org.json:json:20141113"
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
     }
 }
 

@@ -1,9 +1,13 @@
 package MultiplayerServer;
 
+import MultiplayerServer.DataModel.Messages.StartRound;
+import MultiplayerServer.DataModel.Messages.SubTypes.MapInformation;
+import MultiplayerServer.DataModel.Messages.SubTypes.StartPosition;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 
+import com.badlogic.gdx.math.Rectangle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -80,8 +84,7 @@ public class MainServer {
         int i = 0;
 
         while(true) {
-            String s = createJSONObj("startRound", getStartPos(getRandomMap()));
-            sendBroadcast(s);
+            sendBroadcast(String.valueOf(getStartPos(getRandomMap())));
 
             while(!isEndLobby) {
                 for (Map.Entry<String, Client> entry : clients.entrySet()) {
@@ -120,7 +123,7 @@ public class MainServer {
         }
     }
 
-    public static JSONObject getStartPos(File file){
+    public static StartRound getStartPos(File file){
 
         List<RectangleMapObject> spawnPoints = new ArrayList<RectangleMapObject>();
 
@@ -139,23 +142,25 @@ public class MainServer {
             return null;
         }
 
+        List<StartPosition> startPositions = new ArrayList<>();
+        MapInformation map = new MapInformation();
+
         JSONArray arr = new JSONArray();
 
         for(Map.Entry<String, Client> client : clients.entrySet()){
             int i = ThreadLocalRandom.current().nextInt(0,spawnPoints.size());
-            RectangleMapObject rectangleMapObject = spawnPoints.get(i);
-            JSONObject obj = new JSONObject();
-                obj.put("name",client.getKey());
-                obj.put("posX", rectangleMapObject.getRectangle().getX());
-                obj.put("posY", rectangleMapObject.getRectangle().getY());
-                obj.put("width", rectangleMapObject.getRectangle().getWidth());
-                obj.put("height", rectangleMapObject.getRectangle().getHeight());
-            arr.put(obj);
+            System.out.println(i);
+
+            StartPosition startPosition = new StartPosition();
+                Rectangle rectangle = spawnPoints.get(i).getRectangle();
+                startPosition.setPlayerName(client.getKey());
+                startPosition.setRectangle(rectangle);
+            startPositions.add(startPosition);
         }
-        JSONObject obj = new JSONObject();
-            obj.put("map",Constants.General.MAP_PATH+file.getName());
-            obj.put("startPos", arr);
-        return obj;
+
+        map.setMap(Constants.General.MAP_PATH+file.getName());
+
+        return new StartRound(map, startPositions);
     }
 
     private static RectangleMapObject parseToRectangle(String s){

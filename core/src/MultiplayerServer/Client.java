@@ -87,4 +87,8 @@ public class Client extends Thread{
     public void setIsDead(boolean isDead) {
         this.isDead = isDead;
     }
+
+    public DevConsolePresenter getDevConsole() {
+        return devConsole;
+    }
 }

@@ -1,5 +1,8 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.StartRound;
+import MultiplayerServer.DataModel.Messages.SubTypes.StartPosition;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -41,7 +44,7 @@ public class GameHandler implements Screen {
 
     private String map;
     private boolean startGameRound = false;
-    private JSONArray players;
+    private List<StartPosition> startPositions;
     private String myName;
 
     public GameHandler(List<String> players, Socket socket, String myName){
@@ -64,15 +67,13 @@ public class GameHandler implements Screen {
             public void run() {
                 try{
                     while(true){
-                        JSONObject obj = new JSONObject(reader.readLine());
-                        System.out.println(obj.toString());
-                        if(obj.getString("type").equals("startRound")) {
-                            JSONObject data = obj.getJSONObject("data");
-                            players = data.getJSONArray("startPos");
-                            map = data.getString("map");
-                            startGameRound = true;
-                            throw new InterruptedException();
-                        }
+                        StartRound startRound = (StartRound) MessageUtils.deserialize(reader.readLine());
+                        System.out.println(startRound.toString());
+
+                        startPositions = startRound.getPositions();
+                        map = startRound.getMapInformation().getMap();
+                        startGameRound = true;
+                        throw new InterruptedException();
                     }
                 }catch (IOException e) {
                     e.printStackTrace();
@@ -109,7 +110,7 @@ public class GameHandler implements Screen {
             System.out.println("NEW Round started!");
             startGameRound = false;
             musicHandler.startMusic(.3f);
-            ((Game) Gdx.app.getApplicationListener()).setScreen(new MultiplayerScreen(map, players, socket, this, musicHandler));
+            ((Game) Gdx.app.getApplicationListener()).setScreen(new MultiplayerScreen(map, startPositions, socket, this, musicHandler));
         }
     }
 
