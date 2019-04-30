@@ -3,6 +3,7 @@ package MultiplayerServer;
 import MultiplayerServer.DataModel.Messages.StartRound;
 import MultiplayerServer.DataModel.Messages.SubTypes.MapInformation;
 import MultiplayerServer.DataModel.Messages.SubTypes.StartPosition;
+import MultiplayerServer.DataModel.Messages.UpdateLobby;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -175,13 +176,13 @@ public class MainServer {
     }
 
     public static void updateLobby(){
-        JSONArray arr = new JSONArray();
+        UpdateLobby updateLobby = new UpdateLobby(new ArrayList<>());
         for(Map.Entry<String, Client> entry : clients.entrySet()){
-            arr.put(entry.getKey());
+            updateLobby.getPlayers().add(entry.getKey());
         }
 
         for(Map.Entry<String, Client> entry : clients.entrySet()){
-            entry.getValue().println(createJSONObj("updateLobby",arr));
+            entry.getValue().println(updateLobby.toString());
         }
     }
 
@@ -237,8 +238,6 @@ public class MainServer {
                     return i;
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,8 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.UpdateLobby;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -74,15 +77,17 @@ public class LobbyScreen implements Screen {
             public void run() {
                 try {
                     while(true){
+                        Message message = MessageUtils.deserialize(reader.readLine());
+                        if (message instanceof UpdateLobby) {
+                            updateLobby(((UpdateLobby)message).getPlayers());
+                        }
+
                         JSONObject obj = new JSONObject(reader.readLine());
-                        if (obj.getString("type").equals("updateLobby")) {
-                            updateLobby(obj.getJSONArray("data"));
-                        }else if(obj.getString("type").equals("kick")){
+                        if(obj.getString("type").equals("kick")){
                             writer.println(createJSONObj("disconnect",null));
                             writer.flush();
                             ((Game)Gdx.app.getApplicationListener()).setScreen(new Menu(bg));
                         }else if(obj.getString("type").equals("GameStart")){
-
                             throw new InterruptedException();
                         }
                     }
@@ -97,24 +102,22 @@ public class LobbyScreen implements Screen {
         stage.addActor(table);
     }
 
-    public void updateLobby(JSONArray arr){
+    public void updateLobby(List<String> players){
         table.clear();
-        players.clear();
-        for(int i = 0; i < arr.length(); i++){
-            if(i == 0){
-                Label label = new Label("Lobby",skin);
-                label.setFontScale(2);
-                table.add(label).row();
-            }
-            if(arr.getString(i).equals(myName)){
-                Label label = new Label(arr.getString(i),skin,"myPlayer");
-                table.add(label).row();
-            }else{
-                Label label = new Label(arr.getString(i),skin);
-                table.add(label).row();
+        this.players = players;
+
+        Label lobbyLabel = new Label("Lobby",skin);
+        lobbyLabel.setFontScale(2);
+        table.add(lobbyLabel).row();
+
+        for(String player: players){
+            Label label = new Label(player, skin);
+
+            if(player.equals(myName)){
+                label = new Label(player, skin,"myPlayer");
             }
 
-            players.add(arr.getString(i));
+            table.add(label).row();
         }
     }
 

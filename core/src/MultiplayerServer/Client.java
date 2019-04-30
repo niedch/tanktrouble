@@ -1,5 +1,7 @@
 package MultiplayerServer;
 
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.SetPlayerName;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 
@@ -29,7 +31,9 @@ public class Client extends Thread{
             this.devConsole = devConsole;
             writer = new PrintWriter(socket.getOutputStream(),true);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.setPlayerName(new JSONObject(reader.readLine()).getString("name"));
+            SetPlayerName setPlayerName = (SetPlayerName) MessageUtils .deserialize(reader.readLine());
+
+            this.setPlayerName(setPlayerName.getPlayerName());
             TAG = this.getPlayerName();
             this.start();
         } catch (IOException e) {

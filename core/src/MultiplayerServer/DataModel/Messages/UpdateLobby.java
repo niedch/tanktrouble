@@ -12,4 +12,16 @@ public class UpdateLobby extends Message {
     public UpdateLobby() {
         // Dummy
     }
+
+    public UpdateLobby(List<String> players) {
+        this.players = players;
+    }
+
+    public List<String> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<String> players) {
+        this.players = players;
+    }
 }

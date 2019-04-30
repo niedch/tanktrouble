@@ -1,5 +1,6 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Messages.SetPlayerName;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -70,11 +71,10 @@ public class EnterPlayerNameScreen implements Screen {
                         Socket socket = null;
                         try {
                             socket = Gdx.net.newClientSocket(Net.Protocol.TCP, ipAddress.getText(), 9999, socketHints);
-                            JSONObject obj = new JSONObject();
-                            obj.put("name", textField.getText());
+                            SetPlayerName setPlayerName = new SetPlayerName(textField.getText());
 
                             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-                            writer.println(obj.toString());
+                            writer.println(setPlayerName.toString());
 
                             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                             try {
