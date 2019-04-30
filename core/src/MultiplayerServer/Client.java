@@ -1,5 +1,6 @@
 package MultiplayerServer;
 
+import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 
 import org.json.JSONObject;
@@ -20,9 +21,9 @@ public class Client extends Thread{
     private PrintWriter writer;
 
     private Socket socket;
-    private DevConsole devConsole;
+    private DevConsolePresenter devConsole;
 
-    public Client(Socket socket, DevConsole devConsole){
+    public Client(Socket socket, DevConsolePresenter devConsole){
         this.socket = socket;
         try {
             this.devConsole = devConsole;

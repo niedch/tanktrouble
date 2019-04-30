@@ -1,5 +1,6 @@
 package MultiplayerServer;
 
+import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 
@@ -24,7 +25,7 @@ import Utils.Constants;
 import scenes.ScoreBoard;
 
 public class MainServer {
-    public static DevConsole devConsole;
+    public static DevConsolePresenter devConsole;
     public static HashMap<String, Client> clients;
     public static ServerSocket serverSocket;
     public static final String TAG = "MainServer";
@@ -33,7 +34,7 @@ public class MainServer {
 
 
     public MainServer(){
-        devConsole = new DevConsole();
+        devConsole = new DevConsolePresenter();
         clients = new HashMap<String, Client>();
 
         MAP_MAXPLAYER = getMAXPlayers();
