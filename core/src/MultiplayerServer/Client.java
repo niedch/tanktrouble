@@ -1,7 +1,9 @@
 package MultiplayerServer;
 
+import MultiplayerServer.DataModel.Message;
 import MultiplayerServer.DataModel.MessageUtils;
 import MultiplayerServer.DataModel.Messages.SetPlayerName;
+import MultiplayerServer.DataModel.Messages.WorkingInterfaces.IWorkingServer;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 
@@ -44,21 +46,12 @@ public class Client extends Thread{
     @Override
     public void run() {
         try {
-            for(;;){
-                JSONObject result = new JSONObject(reader.readLine());
-                if(result.getString("type").equals("disconnect")){
-                    Gdx.app.log(TAG, this.getPlayerName() + ": disconnected!");
-                }else if(result.getString("type").equals("updatePos")){
-                    MainServer.sendBroadcast(result.toString(),this);
-                }else if(result.getString("type").equals("shot")){
-                    MainServer.sendBroadcast(result.toString(),this);
-                }else if(result.getString("type").equals("died")){
-                    devConsole.println(playerName+": died!");
-                    this.isDead = true;
-                }else if(result.getString("type").equals("updateBullet")){
-                    MainServer.sendBroadcast(result.toString(),this);
-                }
+            for (; ; ) {
+                IWorkingServer message = (IWorkingServer) MessageUtils.deserialize(reader.readLine());
+                message.workServer(this);
             }
+        } catch (NullPointerException e) {
+            System.err.println("Invalid message sent to child process");
         } catch (IOException e) {
             MainServer.clients.remove(playerName);
         } finally {

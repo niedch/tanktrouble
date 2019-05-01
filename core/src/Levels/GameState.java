@@ -205,4 +205,12 @@ public abstract class GameState implements Screen,ContactListener, Runnable{
     public void endContact(Contact contact) {
 
     }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public void setWorld(World world) {
+        this.world = world;
+    }
 }

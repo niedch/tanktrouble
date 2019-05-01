@@ -13,4 +13,24 @@ public class ScoreEntry {
         this.playerName = playerName;
         this.scoreResult = scoreResult;
     }
+
+    public ScoreEntry() {
+        // Dummy constructor
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public int getScoreResult() {
+        return scoreResult;
+    }
+
+    public void setScoreResult(int scoreResult) {
+        this.scoreResult = scoreResult;
+    }
 }

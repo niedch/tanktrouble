@@ -1,17 +1,28 @@
 package MultiplayerServer.DataModel.Messages;
 
+import MultiplayerClient.MultiplayerScreen;
 import MultiplayerServer.DataModel.Message;
-import MultiplayerServer.DataModel.Messages.SubTypes.ScoreEntry;
+import MultiplayerServer.DataModel.Messages.SubTypes.ScoreBoard;
+import MultiplayerServer.DataModel.Messages.WorkingInterfaces.IWorkingClient;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import scenes.ScoreBoard;
 
-import java.util.List;
 
-public class EndRound extends Message {
+public class EndRound extends Message implements IWorkingClient {
     @JsonProperty
-    List<ScoreEntry> score;
+    ScoreBoard scoreBoard;
 
-    public EndRound(List<ScoreEntry> score) {
-        this.score = score;
+    public EndRound(ScoreBoard scoreBoard) {
+        this.scoreBoard = scoreBoard;
+    }
+
+    public EndRound() {
+        // Dummy constructor
+    }
+
+    @Override
+    public void workClient(MultiplayerScreen screen) throws InterruptedException {
+        screen.setScoreBoard(scoreBoard);
+        screen.setStopThread(true);
+        throw new InterruptedException();
     }
 }

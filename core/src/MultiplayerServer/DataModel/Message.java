@@ -12,8 +12,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type"
 )
 @JsonSubTypes({
+        @JsonSubTypes.Type(value = ConnectedOk.class, name = "connectedOk"),
+        @JsonSubTypes.Type(value = ConnectedNotOk.class, name = "connectedNotOk"),
         @JsonSubTypes.Type(value = Died.class, name = "died"),
         @JsonSubTypes.Type(value = Disconnect.class, name = "disconnect"),
+        @JsonSubTypes.Type(value = EndGame.class, name = "endGame"),
         @JsonSubTypes.Type(value = EndRound.class, name = "endRound"),
         @JsonSubTypes.Type(value = GameStart.class, name = "gameStart"),
         @JsonSubTypes.Type(value= SetPlayerName.class, name = "setPlayerName"),
@@ -24,10 +27,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = UpdatePosition.class, name = "updatePosition"),
 })
 public abstract class Message {
-    public void workServer(Client serverChild) {
-        // Empty implementation
-    };
-
     public Message() {
         // Dummy constructor
     }

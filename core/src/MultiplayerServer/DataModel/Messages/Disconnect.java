@@ -2,11 +2,12 @@ package MultiplayerServer.DataModel.Messages;
 
 import MultiplayerServer.Client;
 import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.Messages.WorkingInterfaces.IWorkingServer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class Disconnect extends Message {
+public class Disconnect extends Message implements IWorkingServer {
     @JsonProperty
     private String playerName;
 

@@ -1,5 +1,7 @@
 package Levels;
 
+import MultiplayerServer.DataModel.Messages.SubTypes.ScoreBoard;
+import MultiplayerServer.DataModel.Messages.SubTypes.ScoreEntry;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -16,11 +17,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.Map;
 
-import javax.swing.text.View;
-
 import Skins.BasicSkin;
 import Utils.MusicHandler;
-import scenes.ScoreBoard;
 
 /**
  * Created by Christoph on 19.03.2016.
@@ -36,15 +34,15 @@ public class BetweenLevelScreen implements Screen {
         Table table = new Table();
         table.setFillParent(true);
 
-            for(Map.Entry<String, Integer> entry : scoreBoard.getScoreMap().entrySet()){
-                Label label;
-                if(entry.getKey().equals(" Player 1 ")){
-                    label = new Label(entry.getKey()+" : "+entry.getValue().intValue(),skin,"playerGreen");
-                }else{
-                    label = new Label(entry.getKey()+" : "+entry.getValue().intValue(),skin,"playerRed");
-                }
-                table.add(label).row();
+        for(ScoreEntry scoreEntry: scoreBoard.getScoreEntries()) {
+            Label label;
+            if (scoreEntry.getPlayerName().equals(" Player 1 ")) {
+                label = new Label(scoreEntry.getPlayerName()+ " : "+scoreEntry.getScoreResult(), skin, "playerGreen");
+            }else {
+                label = new Label(scoreEntry.getPlayerName()+ " : "+scoreEntry.getScoreResult(), skin, "playerRed");
             }
+            table.add(label).row();
+        }
         stage.addActor(table);
 
         stage.addAction(new SequenceAction(Actions.delay(5f),Actions.run(new Runnable() {

@@ -1,9 +1,10 @@
 package MultiplayerServer;
 
-import MultiplayerServer.DataModel.Messages.StartRound;
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.Messages.*;
 import MultiplayerServer.DataModel.Messages.SubTypes.MapInformation;
+import MultiplayerServer.DataModel.Messages.SubTypes.ScoreBoard;
 import MultiplayerServer.DataModel.Messages.SubTypes.StartPosition;
-import MultiplayerServer.DataModel.Messages.UpdateLobby;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -14,20 +15,15 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import Utils.Constants;
-import scenes.ScoreBoard;
 
 public class MainServer {
     public static DevConsolePresenter devConsole;
@@ -59,11 +55,16 @@ public class MainServer {
                 Client client = new Client(socket, devConsole);
                 if(!clients.containsKey(client.getPlayerName())){
                     clients.put(client.getPlayerName(),client);
+
+                    Message message = new ConnectedOk();
                     devConsole.println(client.getPlayerName() + ": connected!");
-                    client.println(createJSONObj("ok",null));
+                    client.println(message.toString());
+
                     updateLobby();
-                }else
-                    client.println(createJSONObj("nok",null));
+                }else {
+                    Message message = new ConnectedNotOk();
+                    client.println(message.toString());
+                }
             }
         } catch (BindException e) {
             devConsole.println("Server already started!");
@@ -72,14 +73,12 @@ public class MainServer {
         }
 
         devConsole.println("Game started!");
-        Gdx.app.log(TAG, "Game started!");
 
-        sendBroadcast(createJSONObj("GameStart", null));
+        Message message = new GameStart();
+        sendBroadcast(message.toString());
         ScoreBoard scoreBoard = new ScoreBoard();
 
-        for(Map.Entry<String, Client> entry : clients.entrySet()){
-            scoreBoard.addRow(entry.getKey(),0);
-        }
+        scoreBoard.initPlayers(clients.keySet());
 
         boolean isEndLobby = false;
         int i = 0;
@@ -105,14 +104,16 @@ public class MainServer {
                     }
 
                     devConsole.println("Round ended!");
-                    sendBroadcast(createJSONObj("endRound", scoreBoard.toJSONArray()));
+                    Message endMessage = new EndRound(scoreBoard);
+                    sendBroadcast(endMessage.toString());
                 }
                 i = 0;
             }
 
             try {
                 Thread.sleep(3000);
-                sendBroadcast(createJSONObj("endShowStats", null));
+                Message endGame = new EndGame();
+                sendBroadcast(endGame.toString());
                 devConsole.println("End Score Screen send!");
                 for (Map.Entry<String, Client> entry : clients.entrySet()) {
                     entry.getValue().setIsDead(false);
@@ -149,6 +150,7 @@ public class MainServer {
         JSONArray arr = new JSONArray();
 
         for(Map.Entry<String, Client> client : clients.entrySet()){
+            System.out.println("create spawnpoints: "+spawnPoints.size());
             int i = ThreadLocalRandom.current().nextInt(0,spawnPoints.size());
             System.out.println(i);
 

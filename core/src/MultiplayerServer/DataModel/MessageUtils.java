@@ -1,5 +1,6 @@
 package MultiplayerServer.DataModel;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ public class MessageUtils {
 
         try {
             String s = objectMapper.writeValueAsString(message);
-            System.out.println(s);
+            System.out.println("Serialized: "+s);
             return s;
         } catch (IOException e) {
             e.printStackTrace();
@@ -24,7 +25,11 @@ public class MessageUtils {
         MessageUtils.initObjectMapper();
 
         try {
+            System.out.println("Deserialize: "+message);
             return objectMapper.readValue(message, Message.class);
+
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

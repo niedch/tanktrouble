@@ -1,5 +1,9 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.ConnectedNotOk;
+import MultiplayerServer.DataModel.Messages.ConnectedOk;
 import MultiplayerServer.DataModel.Messages.SetPlayerName;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -78,8 +82,9 @@ public class EnterPlayerNameScreen implements Screen {
 
                             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                             try {
-                                JSONObject result = new JSONObject(reader.readLine());
-                                if (result.getString("type").equals("ok")) {
+                                Message message = MessageUtils.deserialize(reader.readLine());
+
+                                if (message instanceof ConnectedOk) {
                                     MoveByAction mba = new MoveByAction();
                                     mba.setAmount(-500, 0);
                                     mba.setDuration(1f);
@@ -90,7 +95,7 @@ public class EnterPlayerNameScreen implements Screen {
                                             ((Game) Gdx.app.getApplicationListener()).setScreen(new LobbyScreen(finalSocket, textField.getText(), bg));
                                         }
                                     })));
-                                } else if (result.getString("type").equals("nok")) {
+                                } else if (message instanceof ConnectedNotOk) {
                                     MoveByAction mba = new MoveByAction();
                                     mba.setAmount(-20, 0);
                                     mba.setDuration(.1f);
