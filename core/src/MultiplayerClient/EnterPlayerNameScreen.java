@@ -1,5 +1,10 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.ConnectedNotOk;
+import MultiplayerServer.DataModel.Messages.ConnectedOk;
+import MultiplayerServer.DataModel.Messages.SetPlayerName;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -70,16 +75,16 @@ public class EnterPlayerNameScreen implements Screen {
                         Socket socket = null;
                         try {
                             socket = Gdx.net.newClientSocket(Net.Protocol.TCP, ipAddress.getText(), 9999, socketHints);
-                            JSONObject obj = new JSONObject();
-                            obj.put("name", textField.getText());
+                            SetPlayerName setPlayerName = new SetPlayerName(textField.getText());
 
                             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-                            writer.println(obj.toString());
+                            writer.println(setPlayerName.toString());
 
                             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                             try {
-                                JSONObject result = new JSONObject(reader.readLine());
-                                if (result.getString("type").equals("ok")) {
+                                Message message = MessageUtils.deserialize(reader.readLine());
+
+                                if (message instanceof ConnectedOk) {
                                     MoveByAction mba = new MoveByAction();
                                     mba.setAmount(-500, 0);
                                     mba.setDuration(1f);
@@ -90,7 +95,7 @@ public class EnterPlayerNameScreen implements Screen {
                                             ((Game) Gdx.app.getApplicationListener()).setScreen(new LobbyScreen(finalSocket, textField.getText(), bg));
                                         }
                                     })));
-                                } else if (result.getString("type").equals("nok")) {
+                                } else if (message instanceof ConnectedNotOk) {
                                     MoveByAction mba = new MoveByAction();
                                     mba.setAmount(-20, 0);
                                     mba.setDuration(.1f);

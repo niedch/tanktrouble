@@ -1,5 +1,13 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.Died;
+import MultiplayerServer.DataModel.Messages.Shot;
+import MultiplayerServer.DataModel.Messages.SubTypes.*;
+import MultiplayerServer.DataModel.Messages.UpdateBullet;
+import MultiplayerServer.DataModel.Messages.UpdatePosition;
+import MultiplayerServer.DataModel.Messages.WorkingInterfaces.IWorkingClient;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
@@ -12,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 
 import Levels.GameState;
 import Tank.FriendlyTank;
@@ -21,27 +30,26 @@ import Tank.Tank;
 import Utils.Constants;
 import Utils.Map;
 import Utils.MusicHandler;
-import scenes.ScoreBoard;
 
 public class MultiplayerScreen extends GameState {
     static final String TAG = "MultiplayerScreen";
     private GameHandler gameHandler;
-    private JSONArray players;
+    private List<StartPosition> startPositions;
     private String mapFile;
     private FriendlyTank localTank;
     private BufferedReader reader;
     private PrintWriter writer;
-    private JSONObject data = null;
+    private TankPosition updateTank = null;
     private Socket socket;
-    private JSONObject whoShot = null;
+    private NewShot whoShot = null;
     private boolean stopThread = false;
-    private JSONArray scoreArr = null;
-    private JSONObject bulletData = null;
+    private ScoreBoard scoreBoard = null;
+    private TankBullets bulletData = null;
 
-    public MultiplayerScreen(String map, JSONArray players, Socket socket, GameHandler gameHandler, MusicHandler musicHandler) {
+    public MultiplayerScreen(String map, List<StartPosition> startPositions, Socket socket, GameHandler gameHandler, MusicHandler musicHandler) {
         super(musicHandler);
         this.gameHandler = gameHandler;
-        this.players = players;
+        this.startPositions = startPositions;
         this.mapFile = map;
         this.writer = new PrintWriter(socket.getOutputStream(),true);
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -50,8 +58,8 @@ public class MultiplayerScreen extends GameState {
 
     @Override
     public void show() {
-        for(int i = 0; i< players.length(); i++){
-            String player = players.getJSONObject(i).getString("name");
+        for(StartPosition startPosition: startPositions){
+            String player = startPosition.getPlayerName();
             if(!player.equals(gameHandler.getMyName())){
                 new MultiplayerTank(world, Constants.Tank.ENEMY_TANK,player, musicHandler);
             }else{
@@ -65,30 +73,32 @@ public class MultiplayerScreen extends GameState {
             @Override
             public void run() {
                 try {
-                    long startTime = System.currentTimeMillis();
                     for (;;) {
                         if (localTank.hasMoved() && !world.isLocked()) {
-                            JSONObject object = new JSONObject();
-                            object.put("name", localTank.getTankName());
-                            object.put("posX", localTank.getTankBody().getPosition().x);
-                            object.put("posY", localTank.getTankBody().getPosition().y);
-                            object.put("angle", localTank.getTankBody().getAngle());
-                            writer.println(createJSONObj("updatePos", object));
+                            TankPosition tankPosition = new TankPosition();
+                            tankPosition.setPlayerName(localTank.getTankName());
+
+                            tankPosition.setPosX(localTank.getTankBody().getPosition().x);
+                            tankPosition.setPosY(localTank.getTankBody().getPosition().y);
+                            tankPosition.setAngle(localTank.getTankBody().getAngle());
+
+                            writer.println(new UpdatePosition(tankPosition));
                         }
 
                         if (localTank.hasShot) {
-                            JSONObject object = new JSONObject();
-                            object.put("name", localTank.getTankName());
-                            object.put("startPosX", Bullet.getStartPos(localTank).x);
-                            object.put("startPosY", Bullet.getStartPos(localTank).y);
-                            object.put("angle", localTank.getTankBody().getAngle());
-                            writer.println(createJSONObj("shot", object));
-                            System.out.println(createJSONObj("shot", object));
+                            NewShot shot = new NewShot();
+                            shot.setPlayerName(localTank.getTankName());
+                            shot.setPosX(Bullet.getStartPos(localTank).x);
+                            shot.setPosY(Bullet.getStartPos(localTank).y);
+                            shot.setAngle(localTank.getTankBody().getAngle());
+
+                            writer.println(new Shot(shot));
                             localTank.hasShot = false;
                         }
 
                         if (localTank.isDead()) {
-                            writer.println(createJSONObj("died", null));
+                            Message died = new Died();
+                            writer.println(died.toString());
                             throw new InterruptedException();
                         }
 
@@ -97,9 +107,8 @@ public class MultiplayerScreen extends GameState {
                         }
 
                         if((localTank.getMyBullets().size() != 0)){
-                            JSONObject data = getBulletUpdateData();
-                            writer.println(createJSONObj("updateBullet",data));
-                            startTime = System.currentTimeMillis();
+                            UpdateBullet updateBullet = getBulletUpdateData();
+                            writer.println(updateBullet);
                         }
 
                         try {
@@ -121,83 +130,69 @@ public class MultiplayerScreen extends GameState {
             public void run() {
                 try{
                     while(true){
-                        JSONObject result = new JSONObject(reader.readLine());
-                        if(result.getString("type").equals("updatePos")){
-                            if(!world.isLocked()) {
-                                JSONObject data = result.getJSONObject("data");
-                                MultiplayerScreen.this.data = data;
-                            }
-                        }else if(result.getString("type").equals("shot")){
-
-                            whoShot = result.getJSONObject("data");
-                        } else if(result.getString("type").equals("endRound")){
-                            throw new InterruptedException(result.getJSONArray("data").toString());
-                        } else if(result.getString("type").equals("updateBullet")){
-                            bulletData = result.getJSONObject("data");
-                        }
+                        IWorkingClient message = (IWorkingClient) MessageUtils.deserialize(reader.readLine());
+                        message.workClient(MultiplayerScreen.this);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
-                    stopThread = true;
-                    scoreArr = new JSONArray(e.getMessage());
                 }
             }
         }).start();
 
-        map = new Map(world,camera,mapFile,players);
+        map = new Map(world,camera,mapFile,startPositions);
         super.show();
     }
 
-    private JSONObject getBulletUpdateData() {
-        JSONObject data = new JSONObject();
-        data.put("name", localTank.getTankName());
-        JSONArray arr = new JSONArray();
+    private UpdateBullet getBulletUpdateData() {
+        TankBullets tankBullets = new TankBullets(localTank.getTankName());
+
         for(int i = 0; i < localTank.getMyBullets().size(); i++){
-            JSONObject obj = new JSONObject();
-            obj.put("count", i);
-            obj.put("posX", localTank.getMyBullets().get(i).getBody().getPosition().x);
-            obj.put("posY", localTank.getMyBullets().get(i).getBody().getPosition().y);
-            obj.put("vecX", localTank.getMyBullets().get(i).getBody().getLinearVelocity().x);
-            obj.put("vecY", localTank.getMyBullets().get(i).getBody().getLinearVelocity().y);
-            arr.put(obj);
+            BulletData bulletData = new BulletData();
+            bulletData.setCount(i);
+
+            bulletData.setPosX(localTank.getMyBullets().get(i).getBody().getPosition().x);
+            bulletData.setPosY(localTank.getMyBullets().get(i).getBody().getPosition().y);
+
+            bulletData.setVecX(localTank.getMyBullets().get(i).getBody().getLinearVelocity().x);
+            bulletData.setVecY(localTank.getMyBullets().get(i).getBody().getLinearVelocity().y);
+
+            tankBullets.bulletDataList.add(bulletData);
         }
-        data.put("arr", arr);
-        return data;
+        return new UpdateBullet(tankBullets);
     }
 
     @Override
     public void render(float delta) {
-        if(data != null) {
+        if(updateTank != null) {
             for (Tank tank : Tank.tanks) {
-                if (tank.getTankName().equals(data.getString("name"))) {
-                    tank.getTankBody().setTransform((float)data.getDouble("posX"),(float)data.getDouble("posY"),(float)data.getDouble("angle"));
+                if (tank.getTankName().equals(updateTank.getPlayerName())) {
+                    tank.getTankBody().setTransform(updateTank.getPosX(),updateTank.getPosY(),updateTank.getAngle());
                 }
             }
-            data = null;
+            updateTank = null;
         }
 
         if(whoShot != null) {
             for (Tank tank : Tank.tanks) {
-                if (tank.getTankName().equals(whoShot.getString("name"))) {
-                    tank.shoot(new Vector2((float)whoShot.getDouble("startPosX"),(float)whoShot.getDouble("startPosY")),(float)whoShot.getDouble("angle"));
+                if (tank.getTankName().equals(whoShot.getPlayerName())) {
+                    tank.shoot(new Vector2(whoShot.getPosX(),whoShot.getPosY()),whoShot.getAngle());
                 }
             }
             whoShot = null;
         }
 
         if(stopThread){
-            ((Game) Gdx.app.getApplicationListener()).setScreen(new MultiplayerScoreScreen(new ScoreBoard(scoreArr), socket, gameHandler, musicHandler));
+            ((Game) Gdx.app.getApplicationListener()).setScreen(new MultiplayerScoreScreen(scoreBoard, socket, gameHandler, musicHandler));
         }
 
         if(bulletData != null){
             try {
                 for (Tank tank : Tank.tanks) {
-                    if (tank.getTankName().equals(bulletData.getString("name"))) {
-                        for (int i = 0; i < bulletData.getJSONArray("arr").length(); i++) {
-                            JSONObject obj = bulletData.getJSONArray("arr").getJSONObject(i);
-                            tank.getMyBullets().get(obj.getInt("count")).getBody().setTransform((float) obj.getDouble("posX"), (float) obj.getDouble("posY"), 0);
-                            tank.getMyBullets().get(obj.getInt("count")).getBody().setLinearVelocity((float) obj.getDouble("vecX"), (float) obj.getDouble("vecY"));
+                    if (tank.getTankName().equals(bulletData.getPlayerName())) {
+                        for (BulletData bulletDataEntry: bulletData.getBulletDataList()) {
+                            tank.getMyBullets().get(bulletDataEntry.getCount()).getBody().setTransform(bulletDataEntry.getPosX(), bulletDataEntry.getPosY(), 0);
+                            tank.getMyBullets().get(bulletDataEntry.getCount()).getBody().setLinearVelocity(bulletDataEntry.getVecX(), bulletDataEntry.getVecY());
                         }
                     }
                 }
@@ -221,5 +216,25 @@ public class MultiplayerScreen extends GameState {
             obj.put("data", data);
         }
         return obj.toString();
+    }
+
+    public void setUpdateTank(TankPosition updateTank) {
+        this.updateTank = updateTank;
+    }
+
+    public void setWhoShot(NewShot whoShot) {
+        this.whoShot = whoShot;
+    }
+
+    public void setScoreBoard(ScoreBoard scoreBoard) {
+        this.scoreBoard = scoreBoard;
+    }
+
+    public void setBulletData(TankBullets bulletData) {
+        this.bulletData = bulletData;
+    }
+
+    public void setStopThread(boolean stopThread) {
+        this.stopThread = stopThread;
     }
 }

@@ -1,5 +1,9 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.GameStart;
+import MultiplayerServer.DataModel.Messages.UpdateLobby;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,28 +14,20 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScalingViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import Skins.BasicSkin;
 import Start.Menu;
-import scenes.ScoreBoard;
 
 public class LobbyScreen implements Screen {
     public static final String TAG = "Lobby";
@@ -74,17 +70,13 @@ public class LobbyScreen implements Screen {
             public void run() {
                 try {
                     while(true){
-                        JSONObject obj = new JSONObject(reader.readLine());
-                        if (obj.getString("type").equals("updateLobby")) {
-                            updateLobby(obj.getJSONArray("data"));
-                        }else if(obj.getString("type").equals("kick")){
-                            writer.println(createJSONObj("disconnect",null));
-                            writer.flush();
-                            ((Game)Gdx.app.getApplicationListener()).setScreen(new Menu(bg));
-                        }else if(obj.getString("type").equals("GameStart")){
-
+                        Message message = MessageUtils.deserialize(reader.readLine());
+                        if (message instanceof UpdateLobby) {
+                            updateLobby(((UpdateLobby)message).getPlayers());
+                        } else if (message instanceof GameStart) {
                             throw new InterruptedException();
                         }
+
                     }
                 } catch (IOException e) {
                     Gdx.app.exit();
@@ -97,24 +89,22 @@ public class LobbyScreen implements Screen {
         stage.addActor(table);
     }
 
-    public void updateLobby(JSONArray arr){
+    public void updateLobby(List<String> players){
         table.clear();
-        players.clear();
-        for(int i = 0; i < arr.length(); i++){
-            if(i == 0){
-                Label label = new Label("Lobby",skin);
-                label.setFontScale(2);
-                table.add(label).row();
-            }
-            if(arr.getString(i).equals(myName)){
-                Label label = new Label(arr.getString(i),skin,"myPlayer");
-                table.add(label).row();
-            }else{
-                Label label = new Label(arr.getString(i),skin);
-                table.add(label).row();
+        this.players = players;
+
+        Label lobbyLabel = new Label("Lobby",skin);
+        lobbyLabel.setFontScale(2);
+        table.add(lobbyLabel).row();
+
+        for(String player: players){
+            Label label = new Label(player, skin);
+
+            if(player.equals(myName)){
+                label = new Label(player, skin,"myPlayer");
             }
 
-            players.add(arr.getString(i));
+            table.add(label).row();
         }
     }
 

@@ -1,28 +1,29 @@
 package MultiplayerServer;
 
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.Messages.*;
+import MultiplayerServer.DataModel.Messages.SubTypes.MapInformation;
+import MultiplayerServer.DataModel.Messages.SubTypes.ScoreBoard;
+import MultiplayerServer.DataModel.Messages.SubTypes.StartPosition;
 import MultiplayerServer.DevConsole.DevConsolePresenter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 
+import com.badlogic.gdx.math.Rectangle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import Utils.Constants;
-import scenes.ScoreBoard;
 
 public class MainServer {
     public static DevConsolePresenter devConsole;
@@ -54,11 +55,16 @@ public class MainServer {
                 Client client = new Client(socket, devConsole);
                 if(!clients.containsKey(client.getPlayerName())){
                     clients.put(client.getPlayerName(),client);
+
+                    Message message = new ConnectedOk();
                     devConsole.println(client.getPlayerName() + ": connected!");
-                    client.println(createJSONObj("ok",null));
+                    client.println(message.toString());
+
                     updateLobby();
-                }else
-                    client.println(createJSONObj("nok",null));
+                }else {
+                    Message message = new ConnectedNotOk();
+                    client.println(message.toString());
+                }
             }
         } catch (BindException e) {
             devConsole.println("Server already started!");
@@ -67,21 +73,18 @@ public class MainServer {
         }
 
         devConsole.println("Game started!");
-        Gdx.app.log(TAG, "Game started!");
 
-        sendBroadcast(createJSONObj("GameStart", null));
+        Message message = new GameStart();
+        sendBroadcast(message.toString());
         ScoreBoard scoreBoard = new ScoreBoard();
 
-        for(Map.Entry<String, Client> entry : clients.entrySet()){
-            scoreBoard.addRow(entry.getKey(),0);
-        }
+        scoreBoard.initPlayers(clients.keySet());
 
         boolean isEndLobby = false;
         int i = 0;
 
         while(true) {
-            String s = createJSONObj("startRound", getStartPos(getRandomMap()));
-            sendBroadcast(s);
+            sendBroadcast(String.valueOf(getStartPos(getRandomMap())));
 
             while(!isEndLobby) {
                 for (Map.Entry<String, Client> entry : clients.entrySet()) {
@@ -101,14 +104,16 @@ public class MainServer {
                     }
 
                     devConsole.println("Round ended!");
-                    sendBroadcast(createJSONObj("endRound", scoreBoard.toJSONArray()));
+                    Message endMessage = new EndRound(scoreBoard);
+                    sendBroadcast(endMessage.toString());
                 }
                 i = 0;
             }
 
             try {
                 Thread.sleep(3000);
-                sendBroadcast(createJSONObj("endShowStats", null));
+                Message endGame = new EndGame();
+                sendBroadcast(endGame.toString());
                 devConsole.println("End Score Screen send!");
                 for (Map.Entry<String, Client> entry : clients.entrySet()) {
                     entry.getValue().setIsDead(false);
@@ -120,7 +125,7 @@ public class MainServer {
         }
     }
 
-    public static JSONObject getStartPos(File file){
+    public static StartRound getStartPos(File file){
 
         List<RectangleMapObject> spawnPoints = new ArrayList<RectangleMapObject>();
 
@@ -139,23 +144,26 @@ public class MainServer {
             return null;
         }
 
+        List<StartPosition> startPositions = new ArrayList<>();
+        MapInformation map = new MapInformation();
+
         JSONArray arr = new JSONArray();
 
         for(Map.Entry<String, Client> client : clients.entrySet()){
+            System.out.println("create spawnpoints: "+spawnPoints.size());
             int i = ThreadLocalRandom.current().nextInt(0,spawnPoints.size());
-            RectangleMapObject rectangleMapObject = spawnPoints.get(i);
-            JSONObject obj = new JSONObject();
-                obj.put("name",client.getKey());
-                obj.put("posX", rectangleMapObject.getRectangle().getX());
-                obj.put("posY", rectangleMapObject.getRectangle().getY());
-                obj.put("width", rectangleMapObject.getRectangle().getWidth());
-                obj.put("height", rectangleMapObject.getRectangle().getHeight());
-            arr.put(obj);
+            System.out.println(i);
+
+            StartPosition startPosition = new StartPosition();
+                Rectangle rectangle = spawnPoints.get(i).getRectangle();
+                startPosition.setPlayerName(client.getKey());
+                startPosition.setRectangle(rectangle);
+            startPositions.add(startPosition);
         }
-        JSONObject obj = new JSONObject();
-            obj.put("map",Constants.General.MAP_PATH+file.getName());
-            obj.put("startPos", arr);
-        return obj;
+
+        map.setMap(Constants.General.MAP_PATH+file.getName());
+
+        return new StartRound(map, startPositions);
     }
 
     private static RectangleMapObject parseToRectangle(String s){
@@ -170,13 +178,13 @@ public class MainServer {
     }
 
     public static void updateLobby(){
-        JSONArray arr = new JSONArray();
+        UpdateLobby updateLobby = new UpdateLobby(new ArrayList<>());
         for(Map.Entry<String, Client> entry : clients.entrySet()){
-            arr.put(entry.getKey());
+            updateLobby.getPlayers().add(entry.getKey());
         }
 
         for(Map.Entry<String, Client> entry : clients.entrySet()){
-            entry.getValue().println(createJSONObj("updateLobby",arr));
+            entry.getValue().println(updateLobby.toString());
         }
     }
 
@@ -232,8 +240,6 @@ public class MainServer {
                     return i;
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,13 +1,16 @@
 package MultiplayerClient;
 
+import MultiplayerServer.DataModel.Message;
+import MultiplayerServer.DataModel.MessageUtils;
+import MultiplayerServer.DataModel.Messages.EndGame;
+import MultiplayerServer.DataModel.Messages.SubTypes.ScoreBoard;
+import MultiplayerServer.DataModel.Messages.SubTypes.ScoreEntry;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -19,13 +22,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Map;
-
-import Levels.LocalMultiplayer;
 import Skins.BasicSkin;
 import Utils.MusicHandler;
-import scenes.ScoreBoard;
 
 /**
  * Created by Christoph on 24.03.2016.
@@ -45,12 +43,12 @@ public class MultiplayerScoreScreen implements Screen {
         Table table = new Table();
         table.setFillParent(true);
 
-        for(Map.Entry<String, Integer> entry : scoreBoard.getScoreMap().entrySet()){
+        for(ScoreEntry scoreEntry: scoreBoard.getScoreEntries()) {
             Label label;
-            if(entry.getKey().equals(handler.getMyName())){
-                label = new Label(entry.getKey()+" : "+entry.getValue().intValue(),skin,"playerGreen");
-            }else{
-                label = new Label(entry.getKey()+" : "+entry.getValue().intValue(),skin,"playerRed");
+            if (scoreEntry.getPlayerName().equals(handler.getMyName())) {
+                label = new Label(scoreEntry.getPlayerName()+ " : "+scoreEntry.getScoreResult(), skin, "playerGreen");
+            }else {
+                label = new Label(scoreEntry.getPlayerName()+ " : "+scoreEntry.getScoreResult(), skin, "playerRed");
             }
             table.add(label).row();
         }
@@ -63,8 +61,8 @@ public class MultiplayerScoreScreen implements Screen {
             public void run() {
                 try{
                     while(true){
-                        JSONObject result = new JSONObject(reader.readLine());
-                        if(result.getString("type").equals("endShowStats")){
+                        Message message = MessageUtils.deserialize(reader.readLine());
+                        if (message instanceof EndGame) {
                             throw new InterruptedException();
                         }
                     }

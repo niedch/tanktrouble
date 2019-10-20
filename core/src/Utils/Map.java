@@ -1,5 +1,6 @@
 package Utils;
 
+import MultiplayerServer.DataModel.Messages.SubTypes.StartPosition;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -106,7 +107,7 @@ public class Map {
         }
     }
 
-    public Map(World world, OrthographicCamera cam, String file, JSONArray spawnPoints){
+    public Map(World world, OrthographicCamera cam, String file, List<StartPosition> spawnPoints){
         this.cam = cam;
         map = new TmxMapLoader().load(file);
         tmr = new OrthogonalTiledMapRenderer(map);
@@ -150,11 +151,15 @@ public class Map {
             body.createFixture(fixtureDef);
         }
 
-        for(int i = 0; i< spawnPoints.length(); i++){
-            JSONObject obj = spawnPoints.getJSONObject(i);
+        for(StartPosition startPosition: spawnPoints){
             for( Tank tank : Tank.tanks){
-                if(tank.getTankName().equals(obj.getString("name"))){
-                    tank.create(new Vector2((obj.getInt("posX") + obj.getInt("width")/2),(obj.getInt("posY")+obj.getInt("height")/2)));
+                if(tank.getTankName().equals(startPosition.getPlayerName())){
+                    tank.create(
+                            new Vector2(
+                                    (startPosition.getPosX() + startPosition.getWidth()/2),
+                                    (startPosition.getPosY()+startPosition.getHeight()/2)
+                            )
+                    );
                 }
             }
         }
